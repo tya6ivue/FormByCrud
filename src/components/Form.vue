@@ -11,6 +11,8 @@
           ></v-text-field>
           <v-text-field
             outlined
+            type="number"
+            min="0"
             v-model="phoneNumber"
             placeholder="Enter mobile no."
           ></v-text-field>
@@ -59,6 +61,16 @@
         </v-col>
       </v-row>
     </v-container>
+    <div class="text-center">
+      <v-snackbar v-model="snackbar" :multi-line="multiLine">
+        {{ text }}
+        <template v-slot:action="{ attrs }">
+          <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
+            Close
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
   </div>
 </template>
 
@@ -73,6 +85,9 @@ export default {
       address: "",
       hobbies: "",
       Dob: "",
+      multiLine: true,
+      snackbar: false,
+      text: `Input bar should not be empty.`,
     };
   },
   computed: {
@@ -90,21 +105,31 @@ export default {
   methods: {
     ...mapActions("userData", ["Formdata", "clearStoreData"]),
     submit() {
-      let payload = {
-        name: "",
-        phoneNumber: "",
-        address: "",
-        hobbies: "",
-        Dob: "",
-      };
+      let checkName = this.name;
+      let checkPhone = this.phoneNumber;
+      let checkAddress = this.address;
+      let checkHobbies = this.hobbies;
+      let checkDob = this.Dob;
 
-      (payload.name = this.name),
-        (payload.phoneNumber = this.phoneNumber),
-        (payload.address = this.address),
-        (payload.hobbies = this.hobbies),
-        (payload.Dob = this.Dob);
-      this.Formdata(payload);
-      this.clearForm();
+      if (checkName && checkPhone && checkAddress && checkHobbies && checkDob) {
+        let payload = {
+          name: "",
+          phoneNumber: "",
+          address: "",
+          hobbies: "",
+          Dob: "",
+        };
+
+        (payload.name = this.name),
+          (payload.phoneNumber = this.phoneNumber),
+          (payload.address = this.address),
+          (payload.hobbies = this.hobbies),
+          (payload.Dob = this.Dob);
+        this.Formdata(payload);
+        this.clearForm();
+      } else {
+        this.snackbar = true;
+      }
     },
     clearForm() {
       (this.name = ""),
@@ -114,11 +139,13 @@ export default {
         (this.Dob = "");
     },
     EditForm() {
-      (this.name = this.FormData.name),
-        (this.phoneNumber = this.FormData.phoneNumber),
-        (this.address = this.FormData.address),
-        (this.hobbies = this.FormData.hobbies),
-        (this.Dob = this.FormData.Dob);
+      if (this.FormData) {
+        (this.name = this.FormData.name),
+          (this.phoneNumber = this.FormData.phoneNumber),
+          (this.address = this.FormData.address),
+          (this.hobbies = this.FormData.hobbies),
+          (this.Dob = this.FormData.Dob);
+      }
     },
     ClearStore() {
       this.clearStoreData();
