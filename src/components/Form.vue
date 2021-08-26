@@ -48,7 +48,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="6">
+        <v-col cols="6"  secondary rounded-0>
           <div>Name: {{ getName }}</div>
           <div>Phone: {{ getPhoneNumber }}</div>
           <div>Address: {{ getAddress }}</div>
@@ -63,7 +63,8 @@
     </v-container>
     <div class="text-center">
       <v-snackbar v-model="snackbar" :multi-line="multiLine">
-        {{ text }}
+        
+        {{snackBarMessage}}
         <template v-slot:action="{ attrs }">
           <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
             Close
@@ -87,7 +88,9 @@ export default {
       Dob: "",
       multiLine: true,
       snackbar: false,
-      text: `Input bar should not be empty.`,
+      Checksnackbar: false,
+      SameValue: false,
+      snackBarMessage: ''
     };
   },
   computed: {
@@ -104,14 +107,26 @@ export default {
 
   methods: {
     ...mapActions("userData", ["Formdata", "clearStoreData"]),
-    submit() {
+    async submit() {
       let checkName = this.name;
       let checkPhone = this.phoneNumber;
       let checkAddress = this.address;
       let checkHobbies = this.hobbies;
       let checkDob = this.Dob;
-
       if (checkName && checkPhone && checkAddress && checkHobbies && checkDob) {
+        let duplicatePresent = false
+        if (this.formDataArray.length) {
+          this.formDataArray.forEach(el => {
+            if (el.name === checkName) {
+              duplicatePresent = true
+            }
+          });
+        }
+        if (duplicatePresent) {
+          this.snackBarMessage = "Name already exist"
+          this.snackbar = true;
+          return;
+        }
         let payload = {
           name: "",
           phoneNumber: "",
@@ -125,9 +140,12 @@ export default {
           (payload.address = this.address),
           (payload.hobbies = this.hobbies),
           (payload.Dob = this.Dob);
-        this.Formdata(payload);
+        await this.Formdata(payload);
         this.clearForm();
+        this.snackBarMessage = "Form saved"
+        this.snackbar = true;
       } else {
+        this.snackBarMessage = "Fields can't be empty"
         this.snackbar = true;
       }
     },
@@ -147,8 +165,10 @@ export default {
           (this.Dob = this.FormData.Dob);
       }
     },
-    ClearStore() {
-      this.clearStoreData();
+    async ClearStore() {
+      await this.clearStoreData();
+      this.snackBarMessage = "Store cleared"
+        this.snackbar = true;
     },
   },
 };
