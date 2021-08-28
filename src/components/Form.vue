@@ -48,7 +48,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="6"  secondary rounded-0>
+        <v-col cols="6">
           <div>Name: {{ getName }}</div>
           <div>Phone: {{ getPhoneNumber }}</div>
           <div>Address: {{ getAddress }}</div>
@@ -57,14 +57,38 @@
         </v-col>
         <v-col cols="6">
           <div>ArrayData: {{ formDataArray }}</div>
-          <div></div>
+
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Dob</th>
+                  <th>Hobbies</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr v-for="(person, index) in formDataArray" :key="index">
+                  <td>{{ person.name }}</td>
+                  <td>{{ person.phoneNumber }}</td>
+                  <td>{{ person.address }}</td>
+                  <td>{{ person.Dob }}</td>
+                  <td>{{ person.hobbies }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+
+          <div>store: {{ StoreData }}</div>
         </v-col>
       </v-row>
     </v-container>
     <div class="text-center">
       <v-snackbar v-model="snackbar" :multi-line="multiLine">
-        
-        {{snackBarMessage}}
+        {{ snackBarMessage }}
         <template v-slot:action="{ attrs }">
           <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
             Close
@@ -89,8 +113,7 @@ export default {
       multiLine: true,
       snackbar: false,
       Checksnackbar: false,
-      SameValue: false,
-      snackBarMessage: ''
+      snackBarMessage: "",
     };
   },
   computed: {
@@ -102,6 +125,7 @@ export default {
       "getHobbies",
       "getDob",
       "formDataArray",
+      "StoreData",
     ]),
   },
 
@@ -114,19 +138,20 @@ export default {
       let checkHobbies = this.hobbies;
       let checkDob = this.Dob;
       if (checkName && checkPhone && checkAddress && checkHobbies && checkDob) {
-        let duplicatePresent = false
+        let duplicatePresent = false;
         if (this.formDataArray.length) {
-          this.formDataArray.forEach(el => {
+          this.formDataArray.forEach((el) => {
             if (el.name === checkName) {
-              duplicatePresent = true
+              duplicatePresent = true;
             }
           });
         }
         if (duplicatePresent) {
-          this.snackBarMessage = "Name already exist"
+          this.snackBarMessage = "Name already exist";
           this.snackbar = true;
           return;
         }
+
         let payload = {
           name: "",
           phoneNumber: "",
@@ -140,12 +165,13 @@ export default {
           (payload.address = this.address),
           (payload.hobbies = this.hobbies),
           (payload.Dob = this.Dob);
+
         await this.Formdata(payload);
         this.clearForm();
-        this.snackBarMessage = "Form saved"
+        this.snackBarMessage = "Form saved";
         this.snackbar = true;
       } else {
-        this.snackBarMessage = "Fields can't be empty"
+        this.snackBarMessage = "Fields can't be empty";
         this.snackbar = true;
       }
     },
@@ -167,8 +193,8 @@ export default {
     },
     async ClearStore() {
       await this.clearStoreData();
-      this.snackBarMessage = "Store cleared"
-        this.snackbar = true;
+      this.snackBarMessage = "Store cleared";
+      this.snackbar = true;
     },
   },
 };

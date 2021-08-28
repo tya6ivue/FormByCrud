@@ -9,6 +9,10 @@ const state = {
 };
 
 const getters = {
+  StoreData() {
+    return state.stored;
+  },
+
   FormData() {
     return state.form;
   },
@@ -41,6 +45,11 @@ const mutations = {
     state.Dob = paylaod.Dob;
     state.hobbies = paylaod.hobbies;
     state.formData.push(paylaod);
+
+    localStorage.setItem("userDatacreD", JSON.stringify(paylaod));
+    let retrievedObject = localStorage.getItem("userDatacreD");
+    let stored = JSON.parse(retrievedObject);
+    console.log(stored);
   },
   CLEAR_STORE(state) {
     state.form = null;
