@@ -45,6 +45,9 @@
           <div class="d-flex justify-center mt-10">
             <v-btn @click="ClearStore">Clear Store</v-btn>
           </div>
+          <div class="d-flex justify-center mt-10">
+            <v-btn @click="ClearData">Clear All Data</v-btn>
+          </div>
         </v-col>
       </v-row>
       <v-row>
@@ -56,8 +59,6 @@
           <div>Hobbies: {{ getDob }}</div>
         </v-col>
         <v-col cols="6">
-          <div>ArrayData: {{ formDataArray }}</div>
-
           <v-simple-table>
             <template v-slot:default>
               <thead>
@@ -81,8 +82,6 @@
               </tbody>
             </template>
           </v-simple-table>
-
-          <div>store: {{ StoreData }}</div>
         </v-col>
       </v-row>
     </v-container>
@@ -114,8 +113,19 @@ export default {
       snackbar: false,
       Checksnackbar: false,
       snackBarMessage: "",
+      stored: [],
     };
   },
+
+  mounted() {
+    let retrievedObject = localStorage.getItem("userDatacreD");
+    this.stored = JSON.parse(retrievedObject);
+
+    if (this.stored && this.stored.length) {
+      this.sendData();
+    }
+  },
+
   computed: {
     ...mapGetters("userData", [
       "FormData",
@@ -130,7 +140,7 @@ export default {
   },
 
   methods: {
-    ...mapActions("userData", ["Formdata", "clearStoreData"]),
+    ...mapActions("userData", ["Formdata", "clearStoreData", "RetreiveData"]),
     async submit() {
       let checkName = this.name;
       let checkPhone = this.phoneNumber;
@@ -139,7 +149,8 @@ export default {
       let checkDob = this.Dob;
       if (checkName && checkPhone && checkAddress && checkHobbies && checkDob) {
         let duplicatePresent = false;
-        if (this.formDataArray.length) {
+
+        if (this.formDataArray && this.formDataArray.length) {
           this.formDataArray.forEach((el) => {
             if (el.name === checkName) {
               duplicatePresent = true;
@@ -181,6 +192,8 @@ export default {
         (this.address = ""),
         (this.hobbies = ""),
         (this.Dob = "");
+      this.snackBarMessage = "Form data is successfully deleted";
+      this.snackbar = true;
     },
     EditForm() {
       if (this.FormData) {
@@ -191,9 +204,25 @@ export default {
           (this.Dob = this.FormData.Dob);
       }
     },
+
+    async sendData() {
+      await this.RetreiveData(this.stored);
+    },
+
     async ClearStore() {
+      this.clearForm();
       await this.clearStoreData();
       this.snackBarMessage = "Store cleared";
+      this.snackbar = true;
+      this.snackBarMessage = "store data is successfully deleted";
+      this.snackbar = true;
+    },
+
+    async ClearData() {
+      this.clearForm();
+      await this.clearStoreData();
+      localStorage.removeItem("userDatacreD");
+      this.snackBarMessage = "Your data is successfully deleted";
       this.snackbar = true;
     },
   },

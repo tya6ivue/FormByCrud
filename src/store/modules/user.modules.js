@@ -9,10 +9,6 @@ const state = {
 };
 
 const getters = {
-  StoreData() {
-    return state.stored;
-  },
-
   FormData() {
     return state.form;
   },
@@ -37,6 +33,15 @@ const getters = {
 };
 
 const mutations = {
+  RETRIEVE_DATA(state, paylaod) {
+    state.formData = paylaod;
+    state.form = paylaod[paylaod.length - 1];
+    state.name = paylaod[paylaod.length - 1].name;
+    state.address = paylaod[paylaod.length - 1].address;
+    state.phoneNumber = paylaod[paylaod.length - 1].phoneNumber;
+    state.Dob = paylaod[paylaod.length - 1].Dob;
+    state.hobbies = paylaod[paylaod.length - 1].hobbies;
+  },
   FORM_DATA(state, paylaod) {
     state.form = paylaod;
     state.name = paylaod.name;
@@ -45,11 +50,9 @@ const mutations = {
     state.Dob = paylaod.Dob;
     state.hobbies = paylaod.hobbies;
     state.formData.push(paylaod);
-
-    localStorage.setItem("userDatacreD", JSON.stringify(paylaod));
+    localStorage.setItem("userDatacreD", JSON.stringify(state.formData));
     let retrievedObject = localStorage.getItem("userDatacreD");
-    let stored = JSON.parse(retrievedObject);
-    console.log(stored);
+    state.stored = JSON.parse(retrievedObject);
   },
   CLEAR_STORE(state) {
     state.form = null;
@@ -68,6 +71,9 @@ const actions = {
   },
   clearStoreData({ commit }) {
     commit("CLEAR_STORE");
+  },
+  RetreiveData({ commit }, paylaod) {
+    commit("RETRIEVE_DATA", paylaod);
   },
 };
 
